@@ -10,7 +10,6 @@ module.exports.index = async (req, res) => {
     find.status = req.query.status;
   }
 
-  console.log(req.query);
   const sort = {};
 
   if (req.query.sortKey && req.query.sortValue) {

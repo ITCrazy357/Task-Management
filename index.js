@@ -3,7 +3,7 @@ require("dotenv").config();
 const database = require("./config/database");
 
 // Import routes
-const route = require("./routers/index.route");
+const route = require("./api/v1/routers/index.route");
 
 database.connect();
 
