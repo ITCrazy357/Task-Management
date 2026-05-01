@@ -65,3 +65,30 @@ module.exports.detail = async (req, res) => {
     res.status(400).json({ message: "ID không hợp lệ hoặc có lỗi xảy ra" });
   }
 };
+
+//[PATCH] /api/v1/tasks/status/:id
+module.exports.changeStatus = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const status = req.body.status;
+
+    await Task.updateOne(
+      {
+        _id: id,
+      },
+      {
+        status: status,
+      },
+    );
+
+    res.json({
+      code: 200,
+      message: "Cập nhật trạng thái thành công",
+    });
+  } catch (error) {
+    res.json({
+      code: 400,
+      message: "ID không hợp lệ hoặc có lỗi xảy ra",
+    });
+  }
+};
