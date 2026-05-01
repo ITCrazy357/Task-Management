@@ -16,4 +16,6 @@ router.post("/create", taskValidate.taskValidate, controller.create);
 
 router.patch("/edit/:id", taskValidate.taskValidate, controller.edit);
 
+router.delete("/delete/:id", controller.delete);
+
 module.exports = router;
