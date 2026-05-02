@@ -1,24 +1,29 @@
+// ===== 1. IMPORT THƯ VIỆN =====
 const express = require("express");
-
 const bodyParser = require("body-parser");
-
-const database = require("./config/database");
-
+const cors = require("cors");
 require("dotenv").config();
 
-// Import routes
+// ===== 2. IMPORT INTERNAL MODULE =====
+const database = require("./config/database");
 const route = require("./api/v1/routers/index.route");
 
-database.connect();
-
+// ===== 3. KHỞI TẠO APP =====
 const app = express();
 const port = process.env.PORT || 3000;
 
+// ===== 4. CONNECT DATABASE =====
+database.connect();
+
+// ===== 5. MIDDLEWARE =====
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-route(app); // Sử dụng các tuyến đường đã định nghĩa
+// ===== 6. ROUTES =====
+route(app);
 
+// ===== 7. START SERVER =====
 app.listen(port, () => {
-  console.log(`🚀🚀🚀 App listening on port ${port}`);
+  console.log(`🚀 App listening on port ${port}`);
 });
