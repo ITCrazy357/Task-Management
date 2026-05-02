@@ -92,3 +92,24 @@ module.exports.otpValidate = async (req, res, next) => {
 
   next();
 };
+
+module.exports.resetPasswordValidate = (req, res, next) => {
+  const password = req.body.password;
+  const rePassword = req.body.rePassword;
+
+  if (!password || !rePassword) {
+    return res.json({
+      code: 400,
+      message: "Vui lòng nhập đầy đủ thông tin",
+    });
+  }
+
+  if (password !== rePassword) {
+    return res.json({
+      code: 400,
+      message: "Mật khẩu xác nhận không khớp",
+    });
+  }
+
+  next();
+};

@@ -144,3 +144,43 @@ module.exports.otpPassword = async (req, res) => {
     token: token,
   });
 };
+
+//[POST] /api/v1/users/password/reset
+module.exports.resetPassword = async (req, res) => {
+  const password = req.body.password;
+  const token = req.cookies.token;
+
+  const user = await User.findOne({
+    token: token,
+    deleted: false,
+  });
+
+  if (!user) {
+    return res.json({
+      code: 400,
+      message: "Người dùng không tồn tại hoặc token không hợp lệ",
+    });
+  }
+
+  if (md5(password) === user.password) {
+    return res.json({
+      code: 400,
+      message: "Mật khẩu mới không được trùng với mật khẩu cũ",
+    });
+  }
+
+  await User.updateOne(
+    {
+      token: token,
+      deleted: false,
+    },
+    {
+      password: md5(password),
+    },
+  );
+
+  res.json({
+    code: 200,
+    message: "Đặt lại mật khẩu thành công",
+  });
+};
