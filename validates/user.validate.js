@@ -47,3 +47,54 @@ module.exports.loginValidate = (req, res, next) => {
   }
   next();
 };
+
+module.exports.forgotPasswordValidate = (req, res, next) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.json({
+      code: 400,
+      message: "Vui lòng nhập email",
+    });
+  }
+  next();
+};
+
+module.exports.otpValidate = async (req, res, next) => {
+  const email = req.body.email;
+  const otp = req.body.otp;
+
+  if (!email || !otp) {
+    return res.json({
+      code: 400,
+      message: "Vui lòng nhập email và mã OTP",
+    });
+  }
+
+  const otpRecord = await ForgotPassword.findOne({
+    email: email,
+    deleted: false,
+  }).sort({ createdAt: -1 });
+
+  if (!otpRecord) {
+    return res.json({
+      code: 400,
+      message: "Email không tồn tại hoặc chưa yêu cầu OTP",
+    });
+  }
+
+  if (otpRecord.otp !== otp) {
+    return res.json({
+      code: 400,
+      message: "Mã OTP không chính xác",
+    });
+  }
+
+  if (otpRecord.expiresAt && new Date() > new Date(otpRecord.expiresAt)) {
+    return res.json({
+      code: 400,
+      message: "Mã OTP đã hết hạn",
+    });
+  }
+
+  next();
+};

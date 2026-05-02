@@ -8,4 +8,13 @@ const controller = require("../controllers/user.controller");
 router.post("/register", userValidate.registerValidate, controller.register);
 
 router.post("/login", userValidate.loginValidate, controller.login);
+
+router.post(
+  "/password/forgot",
+  userValidate.forgotPasswordValidate,
+  controller.forgotPassword,
+);
+
+router.post("/password/otp", userValidate.otpValidate, controller.otpPassword);
+
 module.exports = router;
