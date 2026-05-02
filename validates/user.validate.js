@@ -36,3 +36,14 @@ module.exports.registerValidate = (req, res, next) => {
   }
   next();
 };
+
+module.exports.loginValidate = (req, res, next) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.json({
+      code: 400,
+      message: "Vui lòng nhập đầy đủ thông tin",
+    });
+  }
+  next();
+};
