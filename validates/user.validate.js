@@ -1,3 +1,5 @@
+const ForgotPassword = require("../api/v1/models/forgot-password.model");
+
 module.exports.registerValidate = (req, res, next) => {
   const { fullName, email, password } = req.body;
 
@@ -66,33 +68,25 @@ module.exports.otpValidate = async (req, res, next) => {
   if (!email || !otp) {
     return res.json({
       code: 400,
-      message: "Vui lòng nhập email và mã OTP",
+      message: "Vui lòng cung cấp email và mã OTP",
     });
   }
 
   const otpRecord = await ForgotPassword.findOne({
     email: email,
-    deleted: false,
   }).sort({ createdAt: -1 });
 
   if (!otpRecord) {
     return res.json({
       code: 400,
-      message: "Email không tồn tại hoặc chưa yêu cầu OTP",
+      message: "Chưa yêu cầu OTP. Vui lòng thử lại.",
     });
   }
 
   if (otpRecord.otp !== otp) {
     return res.json({
       code: 400,
-      message: "Mã OTP không chính xác",
-    });
-  }
-
-  if (otpRecord.expiresAt && new Date() > new Date(otpRecord.expiresAt)) {
-    return res.json({
-      code: 400,
-      message: "Mã OTP đã hết hạn",
+      message: "Mã OTP không chính xác hoặc đã hết hạn",
     });
   }
 

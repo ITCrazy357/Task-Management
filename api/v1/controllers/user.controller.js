@@ -89,7 +89,7 @@ module.exports.forgotPassword = async (req, res) => {
 
   const otp = generateHelper.generateRandomNumber(6);
 
-  const timeExpire = 3;
+  const timeExpire = 5;
   // Lưu thông tin OTP vào cơ sở dữ liệu
   const objectForgotPassword = {
     email: email,
@@ -115,6 +115,7 @@ module.exports.forgotPassword = async (req, res) => {
 //[POST] /api/v1/users/password/otp
 module.exports.otpPassword = async (req, res) => {
   const email = req.body.email;
+  const otp = req.body.otp;
 
   const user = await User.findOne({
     email: email,
@@ -127,6 +128,12 @@ module.exports.otpPassword = async (req, res) => {
       message: "Không tìm thấy người dùng",
     });
   }
+
+  // Hủy mã OTP sau khi sử dụng thành công để tránh tình trạng dùng lại mã
+  await ForgotPassword.deleteOne({
+    email: email,
+    otp: otp,
+  });
 
   const token = user.token;
   res.cookie("token", token);
