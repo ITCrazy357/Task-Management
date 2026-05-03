@@ -1,4 +1,5 @@
 const Task = require("../models/task.model");
+const User = require("../models/user.model");
 const paginationHelper = require("../../../helpers/pagination");
 const searchHelper = require("../../../helpers/search");
 
@@ -137,6 +138,22 @@ module.exports.changeMulti = async (req, res) => {
 module.exports.create = async (req, res) => {
   try {
     req.body.createBy = req.user._id;
+    const listUser = req.body.listUser;
+
+    if (listUser && listUser.length > 0) {
+      const countUsers = await User.countDocuments({
+        _id: { $in: listUser },
+        deleted: false,
+      });
+
+      if (countUsers !== listUser.length) {
+        return res.json({
+          code: 400,
+          message: "Một hoặc nhiều User trong danh sách không tồn tại",
+        });
+      }
+    }
+
     const task = new Task(req.body);
     const data = await task.save();
 
