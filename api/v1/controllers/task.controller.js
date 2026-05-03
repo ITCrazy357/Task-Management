@@ -155,6 +155,20 @@ module.exports.create = async (req, res) => {
       }
     }
 
+    if (req.body.taskParentId) {
+      const taskParent = await Task.findOne({
+        _id: req.body.taskParentId,
+        deleted: false,
+      });
+
+      if (!taskParent) {
+        return res.json({
+          code: 400,
+          message: "Task Parent không tồn tại",
+        });
+      }
+    }
+
     const task = new Task(req.body);
     const data = await task.save();
 
