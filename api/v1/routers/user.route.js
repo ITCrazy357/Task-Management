@@ -23,4 +23,6 @@ router.post(
   controller.resetPassword,
 );
 
+router.get("/detail", controller.detail);
+
 module.exports = router;

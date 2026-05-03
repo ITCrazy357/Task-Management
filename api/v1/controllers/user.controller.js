@@ -184,3 +184,26 @@ module.exports.resetPassword = async (req, res) => {
     message: "Đặt lại mật khẩu thành công",
   });
 };
+
+//[GET] /api/v1/users/detail
+module.exports.detail = async (req, res) => {
+  try {
+    const token = req.cookies.token;
+
+    const user = await User.findOne({
+      token: token,
+      deleted: false,
+    }).select("-password -__v -deleted -token  ");
+
+    res.json({
+      code: 200,
+      message: "Lấy thông tin người dùng thành công",
+      info: user,
+    });
+  } catch (error) {
+    res.json({
+      code: 500,
+      message: "Lỗi server",
+    });
+  }
+};
