@@ -201,3 +201,20 @@ module.exports.detail = async (req, res) => {
     });
   }
 };
+
+//[GET] /api/v1/users/list
+module.exports.list = async (req, res) => {
+  try {
+    const users = await User.find({ deleted: false }).select("fullname email");
+    res.json({
+      code: 200,
+      message: "Lấy danh sách người dùng thành công",
+      users: users,
+    });
+  } catch (error) {
+    res.json({
+      code: 500,
+      message: "Lỗi server",
+    });
+  }
+};
