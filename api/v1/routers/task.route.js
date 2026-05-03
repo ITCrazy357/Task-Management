@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const controller = require("../controllers/task.controller");
-const taskValidate = require("../../../validates/task.validate");
+const taskValidate = require("../validates/task.validate");
 
 router.get("/", controller.index);
 

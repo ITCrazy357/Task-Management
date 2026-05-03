@@ -1,4 +1,4 @@
-const ForgotPassword = require("../api/v1/models/forgot-password.model");
+const ForgotPassword = require("../models/forgot-password.model");
 
 module.exports.registerValidate = (req, res, next) => {
   const { fullName, email, password } = req.body;
