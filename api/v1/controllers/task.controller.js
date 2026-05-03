@@ -5,47 +5,52 @@ const searchHelper = require("../../../helpers/search");
 
 //[GET] /api/v1/tasks
 module.exports.index = async (req, res) => {
-  const find = {
-    $or: [{ createBy: req.user._id }, { listUser: { $in: [req.user._id] } }],
-    deleted: false,
-  };
+  try {
+    const find = {
+      $or: [{ createBy: req.user._id }, { listUser: { $in: [req.user._id] } }],
+      deleted: false,
+    };
 
-  if (req.query.status) {
-    find.status = req.query.status;
+    if (req.query.status) {
+      find.status = req.query.status;
+    }
+    //Search
+    const objectSearch = searchHelper(req.query);
+
+    if (objectSearch.regex) {
+      find.title = objectSearch.regex;
+    }
+
+    //pagination
+    let initPagination = {
+      currentPage: 1,
+      limitItems: 2,
+    };
+
+    const countTasks = await Task.countDocuments(find);
+    const objectPagination = paginationHelper(
+      initPagination,
+      req.query,
+      countTasks,
+    );
+
+    //Sort
+    const sort = {};
+
+    if (req.query.sortKey && req.query.sortValue) {
+      sort[req.query.sortKey] = req.query.sortValue;
+    }
+
+    const tasks = await Task.find(find)
+      .sort(sort)
+      .limit(objectPagination.limitItems)
+      .skip(objectPagination.skip);
+
+    res.json(tasks);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ code: 500, message: "Lỗi server" });
   }
-  //Search
-  const objectSearch = searchHelper(req.query);
-
-  if (objectSearch.regex) {
-    find.title = objectSearch.regex;
-  }
-
-  //pagination
-  let initPagination = {
-    currentPage: 1,
-    limitItems: 2,
-  };
-
-  const countTasks = await Task.countDocuments(find);
-  const objectPagination = paginationHelper(
-    initPagination,
-    req.query,
-    countTasks,
-  );
-
-  //Sort
-  const sort = {};
-
-  if (req.query.sortKey && req.query.sortValue) {
-    sort[req.query.sortKey] = req.query.sortValue;
-  }
-
-  const tasks = await Task.find(find)
-    .sort(sort)
-    .limit(objectPagination.limitItems)
-    .skip(objectPagination.skip);
-
-  res.json(tasks);
 };
 
 //[GET] /api/v1/tasks/detail/:id
@@ -154,20 +159,6 @@ module.exports.create = async (req, res) => {
         });
       }
     }
-    if (req.body.taskParentId) {
-      const taskParent = await Task.findOne({
-        _id: req.body.taskParentId,
-        deleted: false,
-      });
-
-      if (!taskParent) {
-        return res.json({
-          code: 400,
-          message: "Task Parent không tồn tại",
-        });
-      }
-    }
-
     if (req.body.taskParentId) {
       const taskParent = await Task.findOne({
         _id: req.body.taskParentId,
